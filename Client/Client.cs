@@ -4,10 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ServerData;
+using System.Net.Sockets;
+using System.IO;
+using System.Net.Sockets;
+using System.Threading;
 
-namespace Client//TUTORIAL https://www.youtube.com/watch?v=X66hFZG5p3A 28:40 ish 
+namespace Client
 {
-    public class Client
+    class Client
     {
+        static void Main(string[] args)
+        {
+        }
     }
 }

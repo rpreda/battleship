@@ -9,7 +9,7 @@ using System.Net;
 
 namespace ServerData
 {
-    public class Packet//TUTORIAL https://www.youtube.com/watch?v=X66hFZG5p3A 28:40 ish 
+    public class Packet 
     {
         [Serializable]
         public List<string> Gdata;

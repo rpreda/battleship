@@ -9,7 +9,7 @@ using System.IO;
 using System.Threading;
 using System.Net;
 
-namespace Server//TUTORIAL https://www.youtube.com/watch?v=X66hFZG5p3A 28:40 ish 
+namespace Server
 {
     class Server
     {
