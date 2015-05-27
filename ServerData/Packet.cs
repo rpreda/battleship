@@ -9,9 +9,10 @@ using System.Net;
 
 namespace ServerData
 {
+    [Serializable]
     public class Packet 
     {
-        [Serializable]
+        
         public List<string> Gdata;
         public int packetInt;
         public bool packetBool;
@@ -60,6 +61,9 @@ namespace ServerData
 
     public enum PacketType
     {
+        Registration,
+        Message,
+        Sync,
         Start,
         End
     }

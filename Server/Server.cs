@@ -19,6 +19,7 @@ namespace Server
 
         static void Main(string[] args)
         {
+            Console.WriteLine("Starting server on "+Packet.getIP4Address());
             listenerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream ,ProtocolType.Tcp);
             _clients = new List<ClientData>();
             IPEndPoint end = new IPEndPoint(IPAddress.Parse(Packet.getIP4Address()), 4242);
@@ -48,15 +49,26 @@ namespace Server
                 if (readBytes > 0)
                 {
                     Packet p = new Packet(buffer);
-                    DataManager(p);
-                    //handle data
+                    DataManager(p);//Function that handles data recieved from a client
                 }
             }
         }
 
         public static void DataManager(Packet p)
         {
-
+            switch (p.packetType)
+            {
+                case PacketType.Message://When a user sends a message print it in the console and broadcast it to all OTHER users
+                    Console.WriteLine("User " + p.Gdata[0] + " with ID " + p.Gdata[2] + " said: " + p.Gdata[1]);
+                    Packet sync = new Packet(PacketType.Sync, "Server");
+                    sync.Gdata.Add(p.Gdata[0] + ":>" + p.Gdata[1]);
+                    foreach (ClientData i in _clients)
+                    {
+                        if (i.id != p.Gdata[2])
+                            i.clientSocket.Send(sync.ToBytes());
+                    }
+                    break;
+            }
         }
     }
     
@@ -65,20 +77,25 @@ namespace Server
         public Socket clientSocket;
         public Thread clientThread;
         public string id;
-
-        public ClientData()
+        /*public ClientData()//Thist constructor was in tutorial but it seems wrong imo
         {
             id = Guid.NewGuid().ToString();
             clientThread = new Thread(Server.Data_IN);//seems ilogical to me, no way to assign clientSocket so the thread should crash
             clientThread.Start(this.clientSocket);
-        }
+            SendRegistrationPacket();
+        }*/
         public ClientData(Socket socket)
         {
             this.clientSocket = socket;
             id = Guid.NewGuid().ToString();
             clientThread = new Thread(Server.Data_IN);
             clientThread.Start(this.clientSocket);
+            SendRegistrationPacket();
         }
-
+        public void SendRegistrationPacket()
+        {
+            Packet p = new Packet(PacketType.Registration, id);
+            clientSocket.Send(p.ToBytes());
+        }
     }
 }
