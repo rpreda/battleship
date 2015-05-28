@@ -12,7 +12,7 @@ using System.Net;
 namespace Server
 {
 
-    class ClientData//Class that gets instanc
+    class ClientData//This class represents a user that connected to the server
     {
         public Socket clientSocket;
         public Thread clientThread;
@@ -31,32 +31,6 @@ namespace Server
             Packet p = new Packet(PacketType.Registration, id);
             Console.WriteLine("Client with ID " + id + " successfully connected!");
             clientSocket.Send(p.ToBytes());
-        }
-    }
-
-    class GameRoom//The actual game instances
-    {
-        public ClientData owner;
-        public List<ClientData> members;
-        private const int maxPlayers = 1;
-        public bool gameOn;
-        //2 in total with the owner, here is the max player number
-        //should save here somwehre the game state, if it started, where is the shit on the map etc.... here the game logic will rest
-
-        public GameRoom(ClientData owner)
-        {
-            this.owner = owner;
-            gameOn = false;//Means game didn't start yet so the room should be returned when the room list is requested
-            members = new List<ClientData>();
-        }
-        public void addMember(ClientData member)
-        {
-            if (members.Count < maxPlayers && !members.Contains(member))//checks if the member isn't already in and if the max player number is okay
-                members.Add(member);
-        }
-        public void removeMember(ClientData member)
-        {
-            members.Remove(member);
         }
     }
 
@@ -127,7 +101,13 @@ namespace Server
                 }
             }
         }
-
+        public static ClientData findClientById(string id)
+        {
+            foreach (ClientData i in _clients)
+                if (i.id == id)
+                    return (i);
+            return (null);
+        }
         public static void DataManager(Packet p)
         {
             switch (p.packetType)
@@ -157,14 +137,18 @@ namespace Server
                     break;
 
 
-              /*  case PacketType.GetRooms://When the user requests the rooms the server will send them back
+                case PacketType.GetRooms://When the user requests the rooms the server will send them back
                     Console.WriteLine("User with ID " + p.senderID + " requested the room list");
-                    Packet response = new Packet(PacketType.RoomList, "server");
+                    Packet response = new Packet(PacketType.RoomList, "server");//Constructs a room list to send back to the client
+                    response.Gdata.Add("All good ^^");//TEMPORARY code ->works
                     foreach (GameRoom i in _rooms)
                     {
                         response.Gdata.Add(i.owner.id + "~" + i.members.Count + "~" + i.owner.name);
                     }
-                    break;*/
+                    ClientData client = findClientById(p.senderID);
+                    if (client != null)
+                        client.clientSocket.Send(response.ToBytes());//sends the room list back to the client
+                    break;
             }
         }
     }

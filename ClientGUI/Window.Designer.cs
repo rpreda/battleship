@@ -39,6 +39,7 @@
             this.chat_message = new System.Windows.Forms.TextBox();
             this.chat_send = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
+            this.room_request = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -143,11 +144,22 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // room_request
+            // 
+            this.room_request.Location = new System.Drawing.Point(12, 130);
+            this.room_request.Name = "room_request";
+            this.room_request.Size = new System.Drawing.Size(195, 23);
+            this.room_request.TabIndex = 8;
+            this.room_request.Text = "Refresh rooms";
+            this.room_request.UseVisualStyleBackColor = true;
+            this.room_request.Click += new System.EventHandler(this.room_request_Click);
+            // 
             // Window
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1204, 661);
+            this.Controls.Add(this.room_request);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.chat_send);
             this.Controls.Add(this.chat_message);
@@ -176,6 +188,7 @@
         private System.Windows.Forms.TextBox chat_message;
         private System.Windows.Forms.Button chat_send;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button room_request;
     }
 }
 

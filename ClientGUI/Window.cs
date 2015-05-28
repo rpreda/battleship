@@ -57,5 +57,11 @@ namespace ClientGUI
             GameWindow win = new GameWindow();
             win.Show();
         }
+
+        private void room_request_Click(object sender, EventArgs e)
+        {
+            Packet request_rooms = new Packet(PacketType.GetRooms, net.id);
+            net.SendData(request_rooms);//The request system works at the moment but the list update isn't implemented yet
+        }
     }
 }
