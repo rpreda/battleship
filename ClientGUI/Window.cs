@@ -51,5 +51,11 @@ namespace ClientGUI
                 chat_message.Text = "";
             }
         }
+
+        private void button2_Click(object sender, EventArgs e)//debug button
+        {
+            GameWindow win = new GameWindow();
+            win.Show();
+        }
     }
 }

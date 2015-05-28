@@ -61,10 +61,11 @@ namespace ServerData
 
     public enum PacketType
     {
-        Registration,
-        Message,
-        Sync,
-        Start,
-        End
+        NameSet,//Sets the name for the client data
+        RoomList,//Returns the room list
+        GetRooms,//Requests for the rooms
+        Registration,//Tells tells the client the ID that he was assigned
+        Message,//Sends a chat message to the server
+        Sync//Broadcast chat message to all the clients
     }
 }
