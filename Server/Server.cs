@@ -37,7 +37,7 @@ namespace Server
             }
         
         }
-        public static void Data_IN(object cSocket)
+        public static void Data_IN(object cSocket)//Listener function (in separated thread for each client :)
         {
             Socket clientSocket = (Socket)cSocket;
             byte[] buffer;
@@ -45,11 +45,34 @@ namespace Server
             while (true)
             {
                 buffer = new byte[clientSocket.SendBufferSize];
-                readBytes = clientSocket.Receive(buffer);
-                if (readBytes > 0)
+                try
                 {
-                    Packet p = new Packet(buffer);
-                    DataManager(p);//Function that handles data recieved from a client
+                    readBytes = clientSocket.Receive(buffer);
+                    if (readBytes > 0)
+                    {
+                        Packet p = new Packet(buffer);
+                        DataManager(p);//Function that handles data recieved from a client
+                    }
+                }
+                catch// code in case of disconnect WORKS!! NUMBER 71
+                {
+                    ClientData client = null;
+                    Thread current_thread;
+                    foreach (ClientData i in _clients)
+                    {
+                        if (i.clientSocket == cSocket)
+                        { 
+                            Console.WriteLine("Client with ID " + i.id + " lost connection, unloading...");
+                            client = i;
+                            break;
+                        }
+                    }
+                    if (client != null)
+                    {
+                        current_thread = client.clientThread;
+                        _clients.Remove(client);
+                        current_thread.Abort();
+                    }
                 }
             }
         }
@@ -61,7 +84,7 @@ namespace Server
                 case PacketType.Message://When a user sends a message print it in the console and broadcast it to all OTHER users
                     Console.WriteLine("User " + p.Gdata[0] + " with ID " + p.Gdata[2] + " said: " + p.Gdata[1]);
                     Packet sync = new Packet(PacketType.Sync, "Server");
-                    sync.Gdata.Add(p.Gdata[0] + ":>" + p.Gdata[1]);
+                    sync.Gdata.Add(p.Gdata[0] + ":> " + p.Gdata[1]);
                     foreach (ClientData i in _clients)
                     {
                         if (i.id != p.Gdata[2])
