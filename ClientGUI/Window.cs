@@ -14,15 +14,31 @@ namespace ClientGUI
     public partial class Window : Form
     {
         public delegate void AddMessage(string message);
+        public delegate void UpdateList(UpdateListView data);
         public AddMessage myDelegate;
+        public UpdateList listDelegate;
         private Network net;
+
         public Window()
         {
             InitializeComponent();
             myDelegate = new AddMessage(addMessage);
+            listDelegate = new UpdateList(upListView);
         }
 
-        public void addMessage(string message)
+        public void upListView(UpdateListView data)//Delegate function for updating the list view
+        {
+            if (data.clear)
+                listView1.Items.Clear();
+            else
+            {
+                string[] row = { data.owner_name, data.room_id, data.max_players };
+                ListViewItem item = new ListViewItem(row);
+                listView1.Items.Add(item);
+            }
+        }
+
+        public void addMessage(string message)//Delegate function for updating the chat
         {
             chat.Text += message + Environment.NewLine;
         }
@@ -58,10 +74,40 @@ namespace ClientGUI
             win.Show();
         }
 
-        private void room_request_Click(object sender, EventArgs e)
+        private void room_request_Click(object sender, EventArgs e)//refresh room list
         {
             Packet request_rooms = new Packet(PacketType.GetRooms, net.id);
             net.SendData(request_rooms);//The request system works at the moment but the list update isn't implemented yet
+        }
+
+        private void button3_Click(object sender, EventArgs e)//create room
+        {
+            Packet create_room = new Packet(PacketType.NewRoom, net.id);
+            net.SendData(create_room);
+        }
+
+        private void button4_Click(object sender, EventArgs e)//delete room
+        {
+            Packet delete_room = new Packet(PacketType.DelRoom, net.id);
+            net.SendData(delete_room);
+        }
+
+        private void button6_Click(object sender, EventArgs e)//Function for joining a room
+        {
+            Packet join_room = new Packet(PacketType.JoinRoom, net.id);
+
+        }
+    }
+    public class UpdateListView
+    {
+        public string owner_name;
+        public string room_id;
+        public string max_players;
+        public bool clear;
+
+        public UpdateListView(bool clear)
+        {
+            this.clear = clear;
         }
     }
 }

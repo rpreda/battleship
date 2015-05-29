@@ -51,8 +51,18 @@ namespace Server
             listenerSocket.Bind(end);
             Thread listenThread = new Thread(ListenThread);
             listenThread.Start();
+            Thread commands = new Thread(CommandsThread);
+            commands.Start();
         }
-
+        static void CommandsThread()//Handles the commnads from the console :D
+        {
+            while (true)
+            {
+                string input = Console.ReadLine();
+                if (input == "/exit")
+                    Environment.Exit(0);
+            }
+        }
         static void ListenThread()
         {
             while (true)
@@ -87,6 +97,14 @@ namespace Server
                     {
                         if (i.clientSocket == cSocket)
                         { 
+                            foreach (GameRoom room in _rooms)
+                            {
+                                if (room.owner == i)
+                                {
+                                    _rooms.Remove(room);
+                                    break;
+                                }
+                            }
                             Console.WriteLine("Client with ID " + i.id + " lost connection, unloading...");
                             client = i;
                             break;
@@ -140,15 +158,52 @@ namespace Server
                 case PacketType.GetRooms://When the user requests the rooms the server will send them back
                     Console.WriteLine("User with ID " + p.senderID + " requested the room list");
                     Packet response = new Packet(PacketType.RoomList, "server");//Constructs a room list to send back to the client
-                    response.Gdata.Add("All good ^^");//TEMPORARY code ->works
+                    //response.Gdata.Add("All good ^^");//TEMPORARY code ->works
                     foreach (GameRoom i in _rooms)
                     {
-                        response.Gdata.Add(i.owner.id + "~" + i.members.Count + "~" + i.owner.name);
+                        if (!i.gameOn)//checks if the game is not already running
+                            response.Gdata.Add(i.owner.id + "~" + i.members.Count + "~" + i.owner.name);
                     }
                     ClientData client = findClientById(p.senderID);
                     if (client != null)
                         client.clientSocket.Send(response.ToBytes());//sends the room list back to the client
                     break;
+
+
+                case PacketType.NewRoom://handles the creation of rooms probably saving the room that the user is part of in the user variable is necesary (probably!!!)
+                    bool create = true;
+                    Console.WriteLine("User with id " + p.senderID + " created a new room");
+                    GameRoom new_room = new GameRoom(findClientById(p.senderID));
+                    foreach (GameRoom i in _rooms)//checks if the user isn't already an owner
+                    {
+                        if (i.owner.id == p.senderID)
+                        {
+                            create = false;
+                            break;
+                        }
+                    }
+                    if (create)
+                        _rooms.Add(new_room);
+                    break;
+
+
+                case PacketType.DelRoom://deletes the room
+                    Console.WriteLine("User with id " + p.senderID + " deleted the room he owned");
+                    ClientData userDel = findClientById(p.senderID);
+                    GameRoom toDelete = null;
+                    foreach (GameRoom i in _rooms)
+                    {
+                        if (i.owner == userDel)
+                        {
+                            toDelete = i;
+                            break;
+                        }
+                    }
+                    if (toDelete != null)
+                       _rooms.Remove(toDelete);
+                    break;
+
+                //implement the join room function
             }
         }
     }
