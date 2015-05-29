@@ -34,6 +34,8 @@ namespace ClientGUI
             {
                 string[] row = { data.owner_name, data.room_id, data.max_players };
                 ListViewItem item = new ListViewItem(row);
+                /*if (data.room_id == net.id)
+                    item.BackColor = Color.LightGreen;//makes the room owned by the client green ^^ */
                 listView1.Items.Add(item);
             }
         }
@@ -67,7 +69,11 @@ namespace ClientGUI
                 chat_message.Text = "";
             }
         }
-
+        public void refreshRooms()
+        {
+            Packet request_rooms = new Packet(PacketType.GetRooms, net.id);
+            net.SendData(request_rooms);//The request system works at the moment but the list update isn't implemented yet
+        }
         private void button2_Click(object sender, EventArgs e)//debug button
         {
             GameWindow win = new GameWindow();
@@ -76,26 +82,32 @@ namespace ClientGUI
 
         private void room_request_Click(object sender, EventArgs e)//refresh room list
         {
-            Packet request_rooms = new Packet(PacketType.GetRooms, net.id);
-            net.SendData(request_rooms);//The request system works at the moment but the list update isn't implemented yet
+            refreshRooms();
         }
 
         private void button3_Click(object sender, EventArgs e)//create room
         {
             Packet create_room = new Packet(PacketType.NewRoom, net.id);
             net.SendData(create_room);
+            refreshRooms();
         }
 
-        private void button4_Click(object sender, EventArgs e)//delete room
+        private void button4_Click(object sender, EventArgs e)//leave room
         {
-            Packet delete_room = new Packet(PacketType.DelRoom, net.id);
+            Packet delete_room = new Packet(PacketType.LeaveRoom, net.id);
             net.SendData(delete_room);
+            refreshRooms();
         }
 
         private void button6_Click(object sender, EventArgs e)//Function for joining a room
         {
             Packet join_room = new Packet(PacketType.JoinRoom, net.id);
-
+            if (listView1.SelectedItems.Count > 0)
+            {
+                join_room.Gdata.Add(listView1.SelectedItems[0].SubItems[1].Text);
+                net.SendData(join_room);
+            }
+            refreshRooms();
         }
     }
     public class UpdateListView

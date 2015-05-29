@@ -62,7 +62,7 @@ namespace ServerData
     public enum PacketType
     {
         JoinRoom,//User joins a room he doesn't own :)
-        DelRoom,//delete room
+        LeaveRoom,//delete room
         NewRoom,//Type for the room creation
         NameSet,//Sets the name for the client data
         RoomList,//Returns the room list

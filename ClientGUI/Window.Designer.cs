@@ -115,7 +115,7 @@
             // 
             // chat
             // 
-            this.chat.Location = new System.Drawing.Point(956, 48);
+            this.chat.Location = new System.Drawing.Point(838, 43);
             this.chat.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.chat.Multiline = true;
             this.chat.Name = "chat";
@@ -126,7 +126,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(956, 18);
+            this.label3.Location = new System.Drawing.Point(838, 13);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(47, 20);
@@ -135,7 +135,7 @@
             // 
             // chat_message
             // 
-            this.chat_message.Location = new System.Drawing.Point(956, 695);
+            this.chat_message.Location = new System.Drawing.Point(838, 690);
             this.chat_message.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.chat_message.Name = "chat_message";
             this.chat_message.Size = new System.Drawing.Size(306, 26);
@@ -143,7 +143,7 @@
             // 
             // chat_send
             // 
-            this.chat_send.Location = new System.Drawing.Point(1272, 691);
+            this.chat_send.Location = new System.Drawing.Point(1154, 686);
             this.chat_send.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.chat_send.Name = "chat_send";
             this.chat_send.Size = new System.Drawing.Size(112, 35);
@@ -194,7 +194,7 @@
             this.listView1.Location = new System.Drawing.Point(338, 29);
             this.listView1.Margin = new System.Windows.Forms.Padding(2);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(566, 692);
+            this.listView1.Size = new System.Drawing.Size(442, 692);
             this.listView1.TabIndex = 10;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -220,7 +220,7 @@
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(293, 35);
             this.button4.TabIndex = 11;
-            this.button4.Text = "Delete room";
+            this.button4.Text = "Leave room";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
@@ -238,7 +238,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1452, 764);
+            this.ClientSize = new System.Drawing.Size(1302, 764);
             this.Controls.Add(this.button6);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.listView1);

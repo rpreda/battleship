@@ -32,14 +32,28 @@ namespace Server
             Console.WriteLine("Client with ID " + id + " successfully connected!");
             clientSocket.Send(p.ToBytes());
         }
+        public GameRoom isInRoom()
+        {
+            foreach (GameRoom i in Server._rooms)
+            {
+                if (i.owner.id == this.id)
+                    return (i);
+                foreach (ClientData j in i.members)
+                {
+                    if (j.id == this.id)
+                        return (i);
+                }
+            }
+            return (null);
+        }
     }
 
     class Server
     {
 
-        static Socket listenerSocket;
-        static List<ClientData> _clients;
-        static List<GameRoom> _rooms;
+        public static Socket listenerSocket;
+        public static List<ClientData> _clients;
+        public static List<GameRoom> _rooms;
 
         static void Main(string[] args)
         {
@@ -96,15 +110,8 @@ namespace Server
                     foreach (ClientData i in _clients)
                     {
                         if (i.clientSocket == cSocket)
-                        { 
-                            foreach (GameRoom room in _rooms)
-                            {
-                                if (room.owner == i)
-                                {
-                                    _rooms.Remove(room);
-                                    break;
-                                }
-                            }
+                        {
+                            removeUsrRoomData(i.id);
                             Console.WriteLine("Client with ID " + i.id + " lost connection, unloading...");
                             client = i;
                             break;
@@ -126,8 +133,44 @@ namespace Server
                     return (i);
             return (null);
         }
+        public static void removeUsrRoomData(string id)//in case of disconnect removes the user from the room he is linked to or in case he wants to leave all the rooms
+        {
+            ClientData user = null;
+            user = findClientById(id);
+            if (user.isInRoom() != null)
+            {
+                GameRoom room = null;
+                bool owner = false;
+                foreach (GameRoom i in _rooms)
+                {
+                    if (i.owner.id == id)
+                    {
+                        owner = true;
+                        room = i;
+                        break;
+                    }
+                    foreach (ClientData j in i.members)
+                    {
+                        if (j.id == id)
+                        {
+                            room = i;
+                            goto Found;
+                        }
+                    }
+                }
+                Found:if (room != null)
+                {
+                    if (owner)
+                        _rooms.Remove(room);
+                    else
+                        room.members.Remove(user);
+                }
+            }
+        }
         public static void DataManager(Packet p)
         {
+            ClientData usr = null;
+            GameRoom room = null;
             switch (p.packetType)
             {
                 case PacketType.NameSet://sets the name for the client data
@@ -142,7 +185,6 @@ namespace Server
                     }
                     break;
 
-
                 case PacketType.Message://When a user sends a message print it in the console and broadcast it to all OTHER users
                     Console.WriteLine("User " + p.Gdata[0] + " with ID " + p.Gdata[2] + " said: " + p.Gdata[1]);
                     Packet sync = new Packet(PacketType.Sync, "Server");
@@ -153,7 +195,6 @@ namespace Server
                             i.clientSocket.Send(sync.ToBytes());
                     }
                     break;
-
 
                 case PacketType.GetRooms://When the user requests the rooms the server will send them back
                     Console.WriteLine("User with ID " + p.senderID + " requested the room list");
@@ -171,39 +212,38 @@ namespace Server
 
 
                 case PacketType.NewRoom://handles the creation of rooms probably saving the room that the user is part of in the user variable is necesary (probably!!!)
-                    bool create = true;
-                    Console.WriteLine("User with id " + p.senderID + " created a new room");
-                    GameRoom new_room = new GameRoom(findClientById(p.senderID));
-                    foreach (GameRoom i in _rooms)//checks if the user isn't already an owner
+                    usr = findClientById(p.senderID);
+                    if (usr.isInRoom() == null)
                     {
-                        if (i.owner.id == p.senderID)
-                        {
-                            create = false;
-                            break;
-                        }
-                    }
-                    if (create)
+                        GameRoom new_room = new GameRoom(usr);
                         _rooms.Add(new_room);
+                        Console.WriteLine("User with id " + p.senderID + " created a new room");
+                    }
                     break;
 
 
-                case PacketType.DelRoom://deletes the room
-                    Console.WriteLine("User with id " + p.senderID + " deleted the room he owned");
-                    ClientData userDel = findClientById(p.senderID);
-                    GameRoom toDelete = null;
-                    foreach (GameRoom i in _rooms)
-                    {
-                        if (i.owner == userDel)
-                        {
-                            toDelete = i;
-                            break;
-                        }
-                    }
-                    if (toDelete != null)
-                       _rooms.Remove(toDelete);
+                case PacketType.LeaveRoom://deletes the room
+                    removeUsrRoomData(p.senderID);
+                    Console.WriteLine("User with id " + p.senderID + " left a room");
                     break;
 
                 //implement the join room function
+                case PacketType.JoinRoom://join room code
+                    usr = findClientById(p.senderID);
+                    if (usr.isInRoom() == null)
+                    {
+                        foreach (GameRoom i in _rooms)
+                        {
+                            if (i.owner.id == p.Gdata[0])
+                            {
+                                room = i;
+                                break;
+                            }
+                        }
+                        room.addMember(usr);
+                        Console.WriteLine("User with id " + p.senderID + " joins the room with id " + p.Gdata[0]);
+                    }
+                    break;
             }
         }
     }
