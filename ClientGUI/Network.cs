@@ -24,8 +24,18 @@ namespace ClientGUI
             this.ip = ip;
             this.name = name;
             this.main_window = main;
+            IPEndPoint end = null;
             master = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            IPEndPoint end = new IPEndPoint(IPAddress.Parse(ip), 4242);
+            try
+            {
+                end = new IPEndPoint(IPAddress.Parse(ip), 4242);
+            }
+            catch
+            {
+                System.Windows.Forms.MessageBox.Show("Invalid ip address");
+                Environment.Exit(1);
+            }
+
             try
             {
                 master.Connect(end);

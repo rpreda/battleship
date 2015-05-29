@@ -75,6 +75,12 @@ namespace Server
                 string input = Console.ReadLine();
                 if (input == "/exit")
                     Environment.Exit(0);
+                if (input == "/stats")
+                    Console.WriteLine("Current room number: " + _rooms.Count + " Current player number: " +_clients.Count);
+                if (input == "/ip")
+                    Console.WriteLine(Packet.getIP4Address());
+                if (input == "clear")
+                    Console.Clear();
             }
         }
         static void ListenThread()
